@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <rect width="64" height="64" rx="12" fill="#01596D"/>
+  <!-- Mini door -->
+  <rect x="6" y="10" width="28" height="42" rx="2" fill="#E6F4F6"/>
+  <polygon points="6,10 28,10 28,52 6,52" fill="#0A6A7D"/>
+  <!-- Door knob -->
+  <circle cx="24" cy="33" r="2.5" fill="#7CC9D6"/>
+  <!-- Mini arrow -->
+  <rect x="36" y="28" width="14" height="24" rx="2" fill="#F97316"/>
+  <polygon points="30,28 58,28 44,10" fill="#E6F4F6"/>
+</svg>

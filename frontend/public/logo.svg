@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 210" fill="none">
+  <!-- Open Door (left) -->
+  <!-- Door interior / wall background visible through opening -->
+  <rect x="10" y="18" width="88" height="128" rx="4" fill="#E6F4F6"/>
+  <!-- Door panel (solid teal, slightly open - angled by offset top right) -->
+  <polygon points="10,18 82,18 82,146 10,146" fill="#01596D"/>
+  <!-- Door top edge showing depth (open angle illusion) -->
+  <polygon points="82,18 98,12 98,14 82,20" fill="#0D7D92"/>
+  <!-- Door right side edge depth -->
+  <polygon points="82,18 98,12 98,146 82,146" fill="#0A6A7D"/>
+  <!-- Door knob -->
+  <circle cx="74" cy="88" r="5" fill="#7CC9D6"/>
+
+  <!-- Upward Arrow (right) -->
+  <!-- Arrow body (orange) -->
+  <rect x="112" y="76" width="36" height="70" rx="4" fill="#F97316"/>
+  <!-- Arrow head (dark teal triangle) -->
+  <polygon points="96,78 166,78 130,28" fill="#01596D"/>
+</svg>
