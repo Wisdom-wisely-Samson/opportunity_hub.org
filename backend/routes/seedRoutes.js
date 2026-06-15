@@ -1,5 +1,5 @@
 const express = require("express");
-const seed = require("./seed"); // your seed script
+const seed = require("../seeds/seed"); // your seed script
 
 const router = express.Router();
 
@@ -29,4 +29,4 @@ router.get("/run", async (req, res) => {
   }
 });
 
-export default router;
+module.exports = router;

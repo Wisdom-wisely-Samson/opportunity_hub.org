@@ -17,6 +17,7 @@ const opportunityRoutes = require('./routes/opportunityRoutes');
 const applicationRoutes = require('./routes/applicationRoutes');
 const notificationRoutes = require('./routes/notificationRoutes');
 const adminRoutes = require('./routes/adminRoutes');
+const seedRoute = require('./routes/seedRoutes');
 
 const app = express();
 
@@ -65,6 +66,9 @@ app.use('/api/opportunities', opportunityRoutes);
 app.use('/api/applications', applicationRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/admin', adminRoutes);
+
+app.use('/api/seed', seedRoute);
+
 
 // 404 handler
 app.all('*', (req, res) => {
