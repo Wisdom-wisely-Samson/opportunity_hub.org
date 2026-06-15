@@ -1,8 +1,8 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 const connectDB = async () => {
   try {
-    const conn = await mongoose.connect(process.env.MONGODB_URI, {
+    const conn = await mongoose.connect(process.env.MONGO_URI, {
       autoIndex: true,
     });
     console.log(`✅ MongoDB Connected: ${conn.connection.host}`);
@@ -12,12 +12,12 @@ const connectDB = async () => {
   }
 };
 
-mongoose.connection.on('disconnected', () => {
-  console.warn('⚠️  MongoDB disconnected');
+mongoose.connection.on("disconnected", () => {
+  console.warn("⚠️  MongoDB disconnected");
 });
 
-mongoose.connection.on('reconnected', () => {
-  console.log('🔄 MongoDB reconnected');
+mongoose.connection.on("reconnected", () => {
+  console.log("🔄 MongoDB reconnected");
 });
 
 module.exports = connectDB;
