@@ -315,12 +315,5 @@ const seedData = async () => {
   console.log('  Organization: hr@techcorp-test.com / Org@123456');
   console.log('  Refugee:      amina.hassan@example.com / User@123456');
   console.log('  Refugee:      peter.okello@example.com / User@123456\n');
-
-  await mongoose.disconnect();
-  process.exit(0);
 };
-
-seedData().catch((err) => {
-  console.error('Seed failed:', err);
-  process.exit(1);
-});
+module.exports = seedData;
