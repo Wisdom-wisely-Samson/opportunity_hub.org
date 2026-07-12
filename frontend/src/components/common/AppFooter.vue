@@ -10,9 +10,15 @@
           </div>
           <p class="text-primary-200 text-sm leading-relaxed">Connecting refugees and underserved communities to life-changing opportunities across Uganda, East Africa and beyond.</p>
           <div class="flex gap-3 mt-4">
-            <a href="#" aria-label="Twitter" class="w-8 h-8 bg-primary-400 rounded-lg flex items-center justify-center hover:bg-accent hover:text-primary transition-colors text-sm">𝕏</a>
-            <a href="#" aria-label="Facebook" class="w-8 h-8 bg-primary-400 rounded-lg flex items-center justify-center hover:bg-accent hover:text-primary transition-colors text-sm">f</a>
-            <a href="#" aria-label="LinkedIn" class="w-8 h-8 bg-primary-400 rounded-lg flex items-center justify-center hover:bg-accent hover:text-primary transition-colors text-sm">in</a>
+            <a href="#" aria-label="Twitter" class="w-8 h-8 bg-primary-400 rounded-lg flex items-center justify-center hover:bg-accent hover:text-primary transition-colors">
+              <Twitter class="w-4 h-4" />
+            </a>
+            <a href="#" aria-label="Facebook" class="w-8 h-8 bg-primary-400 rounded-lg flex items-center justify-center hover:bg-accent hover:text-primary transition-colors">
+              <Facebook class="w-4 h-4" />
+            </a>
+            <a href="#" aria-label="LinkedIn" class="w-8 h-8 bg-primary-400 rounded-lg flex items-center justify-center hover:bg-accent hover:text-primary transition-colors">
+              <Linkedin class="w-4 h-4" />
+            </a>
           </div>
         </div>
 
@@ -41,8 +47,8 @@
         <div>
           <h4 class="font-bold text-white mb-4 text-sm uppercase tracking-wider">Contact</h4>
           <ul class="space-y-2.5 text-primary-200 text-sm">
-            <li class="flex items-start gap-2"><span>📧</span><span>info@opportunityhub.org</span></li>
-            <li class="flex items-start gap-2"><span>📍</span><span>Kampala, Uganda<br>East Africa</span></li>
+            <li class="flex items-start gap-2"><Mail class="w-4 h-4 flex-shrink-0 mt-0.5" /><span>info@opportunityhub.org</span></li>
+            <li class="flex items-start gap-2"><MapPin class="w-4 h-4 flex-shrink-0 mt-0.5" /><span>Kampala, Uganda<br>East Africa</span></li>
             <li><router-link to="/about" class="hover:text-accent transition-colors">About Us</router-link></li>
             <li><router-link to="/contact" class="hover:text-accent transition-colors">Help & Support</router-link></li>
           </ul>
@@ -63,6 +69,8 @@
 </template>
 
 <script setup>
+import { Twitter, Facebook, Linkedin, Mail, MapPin } from 'lucide-vue-next'
+
 const categories = [
   { slug: 'job', label: 'Jobs' },
   { slug: 'scholarship', label: 'Scholarships' },

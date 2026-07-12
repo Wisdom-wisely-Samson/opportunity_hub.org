@@ -47,6 +47,12 @@ const opportunitySchema = new mongoose.Schema({
   applicationCount: { type: Number, default: 0 },
   views: { type: Number, default: 0 },
 
+  // Cover image
+  coverImage: {
+    url: { type: String, default: null },
+    publicId: { type: String, default: null }, // Cloudinary public_id for deletion
+  },
+
   // Type-specific fields
   salary: String,
   fundingAmount: String,

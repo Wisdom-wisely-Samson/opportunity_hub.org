@@ -12,30 +12,44 @@
         <p class="text-sm font-semibold text-gray-700 text-center mb-4">I am registering as a...</p>
         <button @click="selectRole('refugee')" :class="['w-full p-5 rounded-xl border-2 text-left transition-all', selectedRole === 'refugee' ? 'border-primary bg-primary/5' : 'border-gray-200 hover:border-primary/40']">
           <div class="flex items-center gap-4">
-            <span class="text-3xl">👤</span>
+            <div class="w-11 h-11 rounded-xl bg-primary/10 text-primary flex items-center justify-center flex-shrink-0">
+              <User class="w-6 h-6" />
+            </div>
             <div>
               <p class="font-bold text-gray-900">Refugee / Applicant</p>
               <p class="text-sm text-gray-500 mt-0.5">I'm looking for jobs, scholarships, grants, and training opportunities</p>
             </div>
-            <div v-if="selectedRole === 'refugee'" class="ml-auto w-6 h-6 bg-primary rounded-full flex items-center justify-center flex-shrink-0"><span class="text-white text-xs">✓</span></div>
+            <div v-if="selectedRole === 'refugee'" class="ml-auto w-6 h-6 bg-primary rounded-full flex items-center justify-center flex-shrink-0">
+              <Check class="w-3.5 h-3.5 text-white" />
+            </div>
           </div>
         </button>
         <button @click="selectRole('organization')" :class="['w-full p-5 rounded-xl border-2 text-left transition-all', selectedRole === 'organization' ? 'border-primary bg-primary/5' : 'border-gray-200 hover:border-primary/40']">
           <div class="flex items-center gap-4">
-            <span class="text-3xl">🏢</span>
+            <div class="w-11 h-11 rounded-xl bg-primary/10 text-primary flex items-center justify-center flex-shrink-0">
+              <Building2 class="w-6 h-6" />
+            </div>
             <div>
               <p class="font-bold text-gray-900">Organization</p>
               <p class="text-sm text-gray-500 mt-0.5">I represent an NGO, employer, university, or training provider</p>
             </div>
-            <div v-if="selectedRole === 'organization'" class="ml-auto w-6 h-6 bg-primary rounded-full flex items-center justify-center flex-shrink-0"><span class="text-white text-xs">✓</span></div>
+            <div v-if="selectedRole === 'organization'" class="ml-auto w-6 h-6 bg-primary rounded-full flex items-center justify-center flex-shrink-0">
+              <Check class="w-3.5 h-3.5 text-white" />
+            </div>
           </div>
         </button>
-        <button @click="step = 'form'" :disabled="!selectedRole" class="btn-primary w-full btn-lg mt-2">Continue →</button>
+        <button @click="step = 'form'" :disabled="!selectedRole" class="btn-primary w-full btn-lg mt-2 flex items-center justify-center gap-1.5">
+          Continue
+          <ArrowRight class="w-4 h-4" />
+        </button>
       </div>
 
       <!-- Registration Form -->
       <div v-if="step === 'form'">
-        <button @click="step = 'role'" class="flex items-center gap-2 text-sm text-gray-500 hover:text-primary mb-4 transition-colors">← Back</button>
+        <button @click="step = 'role'" class="flex items-center gap-1.5 text-sm text-gray-500 hover:text-primary mb-4 transition-colors">
+          <ArrowLeft class="w-4 h-4" />
+          Back
+        </button>
         <form @submit.prevent="handleRegister" class="space-y-4">
           <div v-if="selectedRole === 'organization'">
             <label class="label">Organization Name</label>
@@ -53,13 +67,19 @@
             <label class="label">Password</label>
             <div class="relative">
               <input v-model="form.password" :type="showPwd ? 'text' : 'password'" required class="input-field pr-11" placeholder="Min 8 chars, uppercase + number" />
-              <button type="button" @click="showPwd = !showPwd" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 text-xs">{{ showPwd ? 'Hide' : 'Show' }}</button>
+              <button type="button" @click="showPwd = !showPwd" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors">
+                <EyeOff v-if="showPwd" class="w-4 h-4" />
+                <Eye v-else class="w-4 h-4" />
+              </button>
             </div>
           </div>
           <div>
             <label class="label">Confirm Password</label>
             <input v-model="form.confirmPassword" type="password" required class="input-field" placeholder="Repeat your password" />
-            <p v-if="form.confirmPassword && form.password !== form.confirmPassword" class="error-message">⚠ Passwords don't match</p>
+            <p v-if="form.confirmPassword && form.password !== form.confirmPassword" class="error-message flex items-center gap-1">
+              <AlertCircle class="w-3.5 h-3.5 flex-shrink-0" />
+              Passwords don't match
+            </p>
           </div>
 
           <div class="flex items-start gap-2 pt-1">
@@ -69,8 +89,8 @@
 
           <div v-if="authError" class="p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-600">{{ authError }}</div>
 
-          <button type="submit" :disabled="isLoading || form.password !== form.confirmPassword" class="btn-primary w-full btn-lg">
-            <span v-if="isLoading" class="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+          <button type="submit" :disabled="isLoading || form.password !== form.confirmPassword" class="btn-primary w-full btn-lg flex items-center justify-center gap-2">
+            <Loader2 v-if="isLoading" class="w-5 h-5 animate-spin" />
             {{ isLoading ? 'Creating Account...' : 'Create Account' }}
           </button>
         </form>
@@ -90,6 +110,7 @@ import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/authStore'
 import { useToast } from '@/composables/useToast'
 import { extractErrorMessage } from '@/utils/helpers'
+import { User, Building2, Check, ArrowRight, ArrowLeft, Eye, EyeOff, AlertCircle, Loader2 } from 'lucide-vue-next'
 
 const router = useRouter()
 const route = useRoute()

@@ -13,19 +13,24 @@
             <input v-model="email" type="email" required class="input-field" placeholder="your@email.com" />
           </div>
           <div v-if="error" class="p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-600">{{ error }}</div>
-          <button type="submit" :disabled="isLoading" class="btn-primary w-full btn-lg">
-            <span v-if="isLoading" class="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+          <button type="submit" :disabled="isLoading" class="btn-primary w-full btn-lg flex items-center justify-center gap-2">
+            <Loader2 v-if="isLoading" class="w-5 h-5 animate-spin" />
             {{ isLoading ? 'Sending...' : 'Send Reset Link' }}
           </button>
         </form>
       </div>
       <div v-else class="text-center">
-        <div class="text-5xl mb-4">📧</div>
+        <div class="w-16 h-16 rounded-full bg-primary/10 text-primary flex items-center justify-center mx-auto mb-4">
+          <MailCheck class="w-8 h-8" />
+        </div>
         <h2 class="text-lg font-bold text-gray-900">Check Your Email!</h2>
         <p class="text-gray-600 text-sm mt-2">We've sent a password reset link to <strong>{{ email }}</strong>. The link expires in 1 hour.</p>
         <router-link to="/login" class="btn-primary w-full mt-6 block text-center">Back to Sign In</router-link>
       </div>
-      <router-link to="/login" class="block text-center text-sm text-primary hover:underline mt-4">← Back to Sign In</router-link>
+      <router-link to="/login" class="flex items-center justify-center gap-1.5 text-sm text-primary hover:underline mt-4">
+        <ArrowLeft class="w-3.5 h-3.5" />
+        Back to Sign In
+      </router-link>
     </div>
   </div>
 </template>
@@ -34,6 +39,7 @@
 import { ref } from 'vue'
 import { authService } from '@/services/authService'
 import { extractErrorMessage } from '@/utils/helpers'
+import { MailCheck, ArrowLeft, Loader2 } from 'lucide-vue-next'
 
 const email = ref('')
 const isLoading = ref(false)
