@@ -1,248 +1,27 @@
 const { validationResult } = require("express-validator");
 const Opportunity = require("../models/Opportunity");
-const Organization = require("../models/Organization");
-const SavedOpportunity = require("../models/SavedOpportunity");
-const Application = require("../models/Application");
 const { sendSuccess, sendError } = require("../utils/response");
-const {
-  getPaginationParams,
-  getPaginationMeta,
-} = require("../utils/pagination");
 const { uploadToCloudinary } = require("../utils/cloudinaryUpload");
-
-exports.createOpportunity = async (req, res, next) => {
-  try {
-    // Parse arrays sent as JSON strings (from FormData)
-    if (req.body.requirements) {
-      try {
-        req.body.requirements = JSON.parse(req.body.requirements);
-      } catch {}
-    }
-    if (req.body.benefits) {
-      try {
-        req.body.benefits = JSON.parse(req.body.benefits);
-      } catch {}
-    }
-    if (req.body.tags) {
-      try {
-        req.body.tags = JSON.parse(req.body.tags);
-      } catch {}
-    }
-
-    // Run express-validator (format checks only)
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return sendError(res, 400, "Validation failed", errors.array());
-    }
-
-    // Manual required-field validation AFTER Multer has parsed req.body
-    if (!req.body.title) return sendError(res, 400, "Title is required");
-    if (!req.body.description)
-      return sendError(res, 400, "Description is required");
-    if (!req.body.category) return sendError(res, 400, "Category is required");
-    if (!req.body.location) return sendError(res, 400, "Location is required");
-    if (!req.body.deadline) return sendError(res, 400, "Deadline is required");
-
-    // Find organization linked to this user
-    const org = await Organization.findOne({ user: req.user._id });
-    if (!org) {
-      return sendError(res, 403, "Please create an organization profile first");
-    }
-    if (!org.isVerified) {
-      return sendError(
-        res,
-        403,
-        "Your organization must be verified before posting opportunities",
-      );
-    }
-
-    // Handle cover image upload
-    let coverImage = null;
-    if (req.file) {
-      const result = await uploadToCloudinary(
-        req.file.buffer,
-        "opportunity-hub/opportunities",
-        "image",
-      );
-      coverImage = {
-        url: result.secure_url,
-        publicId: result.public_id,
-      };
-    }
-
-    // Create opportunity
-    const opportunity = await Opportunity.create({
-      ...req.body,
-      organization: org._id,
-      postedBy: req.user._id,
-      coverImage,
-    });
-
-    await opportunity.populate(
-      "organization",
-      "organizationName logo isVerified",
-    );
-
-    return sendSuccess(
-      res,
-      201,
-      "Opportunity created successfully",
-      opportunity,
-    );
-  } catch (err) {
-    next(err);
-  }
-};
-
-exports.getOpportunities = async (req, res, next) => {
-  try {
-    // Parse arrays sent as JSON strings
-    if (req.body.requirements) {
-      try {
-        req.body.requirements = JSON.parse(req.body.requirements);
-      } catch {}
-    }
-    if (req.body.benefits) {
-      try {
-        req.body.benefits = JSON.parse(req.body.benefits);
-      } catch {}
-    }
-    if (req.body.tags) {
-      try {
-        req.body.tags = JSON.parse(req.body.tags);
-      } catch {}
-    }
-
-    const { page, limit, skip } = getPaginationParams(req.query);
-    const {
-      search,
-      category,
-      location,
-      status = "active",
-      remote,
-      sort = "-createdAt",
-    } = req.query;
-
-    const filter = {};
-    if (status) filter.status = status;
-    if (category) filter.category = category;
-    if (remote === "true") filter.isRemote = true;
-    if (location) filter.location = { $regex: location, $options: "i" };
-
-    if (search) {
-      filter.$text = { $search: search };
-    }
-
-    // Filter out past deadlines for active filter
-    if (status === "active") {
-      filter.deadline = { $gte: new Date() };
-    }
-
-    const sortOption = search
-      ? { score: { $meta: "textScore" }, ...parseSortOption(sort) }
-      : parseSortOption(sort);
-
-    const [total, opportunities] = await Promise.all([
-      Opportunity.countDocuments(filter),
-      Opportunity.find(filter, search ? { score: { $meta: "textScore" } } : {})
-        .populate("organization", "organizationName logo isVerified type")
-        .sort(sortOption)
-        .skip(skip)
-        .limit(limit),
-    ]);
-
-    // If user is logged in, add isSaved field
-    let savedIds = [];
-    if (req.user) {
-      const saved = await SavedOpportunity.find({
-        user: req.user._id,
-      }).distinct("opportunity");
-      savedIds = saved.map((id) => id.toString());
-    }
-
-    const data = opportunities.map((opp) => ({
-      ...opp.toObject(),
-      isSaved: savedIds.includes(opp._id.toString()),
-    }));
-
-    return sendSuccess(
-      res,
-      200,
-      "Opportunities retrieved",
-      data,
-      getPaginationMeta(total, page, limit),
-    );
-  } catch (err) {
-    next(err);
-  }
-};
-
-const parseSortOption = (sort) => {
-  const sortMap = {
-    "-createdAt": { createdAt: -1 },
-    createdAt: { createdAt: 1 },
-    "-deadline": { deadline: -1 },
-    deadline: { deadline: 1 },
-    "-applicationCount": { applicationCount: -1 },
-  };
-  return sortMap[sort] || { createdAt: -1 };
-};
-
-exports.getOpportunityById = async (req, res, next) => {
-  try {
-    const opp = await Opportunity.findById(req.params.id)
-      .populate(
-        "organization",
-        "organizationName logo isVerified type website contactEmail country",
-      )
-      .populate("postedBy", "fullName email");
-
-    if (!opp) return sendError(res, 404, "Opportunity not found");
-
-    // Increment views
-    await Opportunity.findByIdAndUpdate(req.params.id, { $inc: { views: 1 } });
-
-    let isSaved = false;
-    let hasApplied = false;
-    if (req.user) {
-      const [saved, applied] = await Promise.all([
-        SavedOpportunity.findOne({ user: req.user._id, opportunity: opp._id }),
-        Application.findOne({ applicant: req.user._id, opportunity: opp._id }),
-      ]);
-      isSaved = !!saved;
-      hasApplied = !!applied;
-    }
-
-    return sendSuccess(res, 200, "Opportunity retrieved", {
-      ...opp.toObject(),
-      isSaved,
-      hasApplied,
-    });
-  } catch (err) {
-    next(err);
-  }
-};
+const cloudinary = require("cloudinary").v2;
 
 exports.updateOpportunity = async (req, res, next) => {
   try {
-    // Parse arrays sent as JSON strings
-    if (req.body.requirements) {
-      try {
-        req.body.requirements = JSON.parse(req.body.requirements);
-      } catch {}
-    }
-    if (req.body.benefits) {
-      try {
-        req.body.benefits = JSON.parse(req.body.benefits);
-      } catch {}
-    }
-    if (req.body.tags) {
-      try {
-        req.body.tags = JSON.parse(req.body.tags);
-      } catch {}
-    }
+    // Parse arrays safely
+    ["requirements", "benefits", "tags"].forEach((field) => {
+      if (req.body[field] && typeof req.body[field] === "string") {
+        try {
+          req.body[field] = JSON.parse(req.body[field]);
+        } catch {
+          req.body[field] = [];
+        }
+      }
+    });
 
-    // Run express-validator (format checks only)
+    // Sanitize optional fields
+    if (req.body.salary) req.body.salary = req.body.salary.toString();
+    if (!req.body.duration) req.body.duration = null;
+
+    // Run express-validator
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return sendError(res, 400, "Validation failed", errors.array());
@@ -269,12 +48,16 @@ exports.updateOpportunity = async (req, res, next) => {
     if (req.file) {
       // Delete old image if exists
       if (coverImage?.publicId) {
-        await uploadToCloudinary.delete(coverImage.publicId);
+        try {
+          await cloudinary.uploader.destroy(coverImage.publicId);
+        } catch (err) {
+          console.error("Cloudinary delete error:", err);
+        }
       }
 
       // Upload new image
       const result = await uploadToCloudinary(
-        req.file.buffer,
+        req.file.buffer || req.file.path, // handle both memoryStorage and diskStorage
         "opportunity-hub/opportunities",
         "image",
       );
@@ -322,6 +105,7 @@ exports.updateOpportunity = async (req, res, next) => {
 
     return sendSuccess(res, 200, "Opportunity updated", updated);
   } catch (err) {
+    console.error("Update opportunity error:", err); // ✅ log actual error
     next(err);
   }
 };
