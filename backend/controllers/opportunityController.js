@@ -6,6 +6,72 @@ const cloudinary = require("cloudinary").v2;
 const Organization = require("../models/Organization");
 const SavedOpportunity = require("../models/SavedOpportunity");
 const Application = require("../models/Application");
+exports.createOpportunity = async (req, res, next) => {
+  try {
+    // Parse arrays safely
+    ["requirements", "benefits", "tags"].forEach((field) => {
+      if (req.body[field] && typeof req.body[field] === "string") {
+        try {
+          req.body[field] = JSON.parse(req.body[field]);
+        } catch {
+          req.body[field] = [];
+        }
+      }
+    });
+
+    // Salary/duration sanitization
+    if (req.body.salary) req.body.salary = req.body.salary.toString();
+    if (!req.body.duration) req.body.duration = null;
+
+    // Validation
+    const errors = validationResult(req);
+    if (!errors.isEmpty())
+      return sendError(res, 400, "Validation failed", errors.array());
+
+    // Organization check
+    const org = await Organization.findOne({ user: req.user._id });
+    if (!org)
+      return sendError(res, 403, "Please create an organization profile first");
+    if (!org.isVerified)
+      return sendError(
+        res,
+        403,
+        "Your organization must be verified before posting opportunities",
+      );
+
+    // Cover image upload
+    let coverImage = null;
+    if (req.file) {
+      const result = await uploadToCloudinary(
+        req.file.buffer || req.file.path, // handle both memoryStorage and diskStorage
+        "opportunity-hub/opportunities",
+        "image",
+      );
+      coverImage = { url: result.secure_url, publicId: result.public_id };
+    }
+
+    const opportunity = await Opportunity.create({
+      ...req.body,
+      organization: org._id,
+      postedBy: req.user._id,
+      coverImage,
+    });
+
+    await opportunity.populate(
+      "organization",
+      "organizationName logo isVerified",
+    );
+    return sendSuccess(
+      res,
+      201,
+      "Opportunity created successfully",
+      opportunity,
+    );
+  } catch (err) {
+    console.error("Create opportunity error:", err); // ✅ log actual error
+    next(err);
+  }
+};
 
 exports.updateOpportunity = async (req, res, next) => {
   try {
@@ -109,6 +175,51 @@ exports.updateOpportunity = async (req, res, next) => {
     return sendSuccess(res, 200, "Opportunity updated", updated);
   } catch (err) {
     console.error("Update opportunity error:", err); // ✅ log actual error
+    next(err);
+  }
+};
+exports.getOpportunities = async (req, res, next) => {
+  try {
+    const { page, limit, skip } = getPaginationParams(req.query);
+    const {
+      search,
+      category,
+      location,
+      status = "active",
+      remote,
+      sort = "-createdAt",
+    } = req.query;
+
+    const filter = {};
+    if (status) filter.status = status;
+    if (category) filter.category = category;
+    if (remote === "true") filter.isRemote = true;
+    if (location) filter.location = { $regex: location, $options: "i" };
+    if (search) filter.$text = { $search: search };
+    if (status === "active") filter.deadline = { $gte: new Date() };
+
+    const sortOption = search
+      ? { score: { $meta: "textScore" }, ...parseSortOption(sort) }
+      : parseSortOption(sort);
+
+    const [total, opportunities] = await Promise.all([
+      Opportunity.countDocuments(filter),
+      Opportunity.find(filter, search ? { score: { $meta: "textScore" } } : {})
+        .populate("organization", "organizationName logo isVerified type")
+        .sort(sortOption)
+        .skip(skip)
+        .limit(limit),
+    ]);
+
+    return sendSuccess(
+      res,
+      200,
+      "Opportunities retrieved",
+      opportunities,
+      getPaginationMeta(total, page, limit),
+    );
+  } catch (err) {
+    console.error("Get opportunities error:", err);
     next(err);
   }
 };
