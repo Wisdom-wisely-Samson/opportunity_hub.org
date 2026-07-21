@@ -180,7 +180,10 @@ exports.updateOpportunity = async (req, res, next) => {
 };
 exports.getOpportunities = async (req, res, next) => {
   try {
-    const { page, limit, skip } = getPaginationParams(req.query);
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 12;
+    const skip = (page - 1) * limit;
+
     const {
       search,
       category,
@@ -199,8 +202,8 @@ exports.getOpportunities = async (req, res, next) => {
     if (status === "active") filter.deadline = { $gte: new Date() };
 
     const sortOption = search
-      ? { score: { $meta: "textScore" }, ...parseSortOption(sort) }
-      : parseSortOption(sort);
+      ? { score: { $meta: "textScore" }, createdAt: -1 }
+      : { createdAt: -1 };
 
     const [total, opportunities] = await Promise.all([
       Opportunity.countDocuments(filter),
@@ -211,18 +214,18 @@ exports.getOpportunities = async (req, res, next) => {
         .limit(limit),
     ]);
 
-    return sendSuccess(
-      res,
-      200,
-      "Opportunities retrieved",
-      opportunities,
-      getPaginationMeta(total, page, limit),
-    );
+    return sendSuccess(res, 200, "Opportunities retrieved", opportunities, {
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+    });
   } catch (err) {
     console.error("Get opportunities error:", err);
     next(err);
   }
 };
+
 exports.getOpportunityById = async (req, res, next) => {
   try {
     const opp = await Opportunity.findById(req.params.id)
