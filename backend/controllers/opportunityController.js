@@ -223,6 +223,42 @@ exports.getOpportunities = async (req, res, next) => {
     next(err);
   }
 };
+exports.getOpportunityById = async (req, res, next) => {
+  try {
+    const opp = await Opportunity.findById(req.params.id)
+      .populate(
+        "organization",
+        "organizationName logo isVerified type website contactEmail country",
+      )
+      .populate("postedBy", "fullName email");
+
+    if (!opp) return sendError(res, 404, "Opportunity not found");
+
+    // Increment views
+    await Opportunity.findByIdAndUpdate(req.params.id, { $inc: { views: 1 } });
+
+    let isSaved = false;
+    let hasApplied = false;
+
+    if (req.user) {
+      const [saved, applied] = await Promise.all([
+        SavedOpportunity.findOne({ user: req.user._id, opportunity: opp._id }),
+        Application.findOne({ applicant: req.user._id, opportunity: opp._id }),
+      ]);
+      isSaved = !!saved;
+      hasApplied = !!applied;
+    }
+
+    return sendSuccess(res, 200, "Opportunity retrieved", {
+      ...opp.toObject(),
+      isSaved,
+      hasApplied,
+    });
+  } catch (err) {
+    console.error("Get opportunity by ID error:", err);
+    next(err);
+  }
+};
 
 exports.deleteOpportunity = async (req, res, next) => {
   try {
