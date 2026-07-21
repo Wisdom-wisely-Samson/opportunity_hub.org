@@ -3,6 +3,9 @@ const Opportunity = require("../models/Opportunity");
 const { sendSuccess, sendError } = require("../utils/response");
 const { uploadToCloudinary } = require("../utils/cloudinaryUpload");
 const cloudinary = require("cloudinary").v2;
+const Organization = require("../models/Organization");
+const SavedOpportunity = require("../models/SavedOpportunity");
+const Application = require("../models/Application");
 
 exports.updateOpportunity = async (req, res, next) => {
   try {
