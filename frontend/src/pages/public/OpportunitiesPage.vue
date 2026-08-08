@@ -118,7 +118,7 @@
                 <h2
                   class="text-2xl sm:text-4xl font-bold text-[#01596D] mt-1 sm:mt-2"
                 >
-                  150+
+                  {{ organizationCount }}
                 </h2>
               </div>
 
@@ -429,6 +429,7 @@ import OpportunityCard from "@/components/opportunity/OpportunityCard.vue";
 import OpportunityFilters from "@/components/opportunity/OpportunityFilters.vue";
 
 import { opportunityService } from "@/services/opportunityService";
+import { organizationService } from "@/services/organizationService";
 
 import {
   Compass,
@@ -472,6 +473,8 @@ const pagination = reactive({
   hasNext: false,
   hasPrev: false,
 });
+
+const organizationCount = ref(0);
 
 const categories = [
   {
@@ -539,6 +542,15 @@ const fetchOpportunities = async () => {
   }
 };
 
+const fetchOrganizationCount = async () => {
+  try {
+    const { data } = await organizationService.getAll({ limit: 1 });
+    organizationCount.value = data.meta?.total || 0;
+  } catch (error) {
+    console.error("Failed to load organization count:", error);
+  }
+};
+
 const applyFilters = () => {
   pagination.page = 1;
 
@@ -593,5 +605,6 @@ const changePage = (page) => {
 
 onMounted(() => {
   fetchOpportunities();
+  fetchOrganizationCount();
 });
 </script>

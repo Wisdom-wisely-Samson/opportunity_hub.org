@@ -11,6 +11,9 @@ const router = createRouter({
     { path: '/opportunities/:id', component: () => import('@/pages/public/OpportunityDetailPage.vue'), meta: { layout: 'default' } },
     { path: '/about', component: () => import('@/pages/public/AboutPage.vue'), meta: { layout: 'default' } },
     { path: '/contact', component: () => import('@/pages/public/ContactPage.vue'), meta: { layout: 'default' } },
+    { path: '/privacy-policy', component: () => import('@/pages/public/PrivacyPolicyPage.vue'), meta: { layout: 'default' } },
+    { path: '/terms-of-service', component: () => import('@/pages/public/TermsOfServicePage.vue'), meta: { layout: 'default' } },
+    { path: '/cookie-policy', component: () => import('@/pages/public/CookiePolicyPage.vue'), meta: { layout: 'default' } },
 
     // Auth
     { path: '/login', component: () => import('@/pages/auth/LoginPage.vue'), meta: { layout: 'auth', guestOnly: true } },
@@ -58,7 +61,7 @@ router.beforeEach((to, from, next) => {
   }
 
   if (to.meta.requiresAuth && !authStore.isAuthenticated) {
-    return next(`/login?redirect=${to.path}`)
+    return next(`/login?redirect=${encodeURIComponent(to.path)}&authError=${encodeURIComponent('Please sign in to continue.')}`)
   }
 
   if (to.meta.role && authStore.user?.role !== to.meta.role) {

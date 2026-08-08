@@ -237,8 +237,22 @@
               This opportunity has expired
             </div>
 
+            <template v-if="opportunity.externalLink">
+              <a
+                :href="opportunity.externalLink"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="btn-primary w-full btn-lg inline-flex items-center justify-center gap-2"
+              >
+                <ExternalLink class="w-4 h-4" />
+                Visit External Application Page
+              </a>
+              <p class="text-xs text-gray-500 mt-3">
+                This opportunity is handled externally and does not require Opportunity Hub login to apply.
+              </p>
+            </template>
             <template
-              v-if="
+              v-else-if="
                 isAuthenticated &&
                 isRefugee &&
                 !opportunity.hasApplied &&
@@ -252,7 +266,7 @@
                 Apply Now
               </button>
             </template>
-            <template v-else-if="!isAuthenticated">
+            <template v-else-if="!isAuthenticated && !opportunity.externalLink">
               <router-link
                 to="/register"
                 class="btn-primary w-full btn-lg text-center block"

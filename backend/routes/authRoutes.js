@@ -12,6 +12,6 @@ router.post('/refresh-token', authController.refreshToken);
 router.post('/forgot-password', authLimiter, forgotPasswordValidator, authController.forgotPassword);
 router.post('/reset-password/:token', authLimiter, resetPasswordValidator, authController.resetPassword);
 router.get('/verify-email/:token', authController.verifyEmail);
-router.post('/resend-verification', protect, authController.resendVerification);
+router.post('/resend-verification', authLimiter, protect, authController.resendVerification);
 
 module.exports = router;

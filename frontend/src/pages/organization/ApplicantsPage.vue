@@ -127,9 +127,10 @@
         <!-- Actions -->
         <div class="flex flex-wrap gap-2 mt-4 pt-3 border-t border-gray-100">
           <a
-            v-if="app.cv?.url"
-            :href="app.cv.url"
+            v-if="getCvUrl(app)"
+            :href="getCvUrl(app)"
             target="_blank"
+            rel="noopener noreferrer"
             class="btn-ghost btn-sm border border-gray-200 inline-flex items-center gap-1.5"
           >
             <FileText class="w-3.5 h-3.5" />
@@ -292,6 +293,8 @@ const filtered = computed(() => {
     list = list.filter((a) => a.status === filterStatus.value);
   return list;
 });
+
+const getCvUrl = (app) => app.cv?.url || app.applicant?.cv?.url || '';
 
 const countByStatus = (status) => {
   let list = applications.value;

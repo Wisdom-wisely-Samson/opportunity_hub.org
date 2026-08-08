@@ -51,7 +51,7 @@
 </template>
 
 <script setup>
-import { ref, reactive } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/authStore'
 import { useToast } from '@/composables/useToast'
@@ -94,4 +94,10 @@ const handleLogin = async () => {
     isLoading.value = false
   }
 }
+
+onMounted(() => {
+  if (route.query.authError) {
+    authError.value = route.query.authError
+  }
+})
 </script>

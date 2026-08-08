@@ -113,9 +113,10 @@
             Withdraw
           </button>
           <a
-            v-if="app.cv?.url"
-            :href="app.cv.url"
+            v-if="getCvUrl(app)"
+            :href="getCvUrl(app)"
             target="_blank"
+            rel="noopener noreferrer"
             class="btn-ghost btn-sm border border-gray-200 inline-flex items-center gap-1.5"
           >
             <FileText class="w-3.5 h-3.5" />
@@ -181,6 +182,8 @@ const categoryIcon = (cat) =>
     fellowship: Trophy,
     entrepreneurship: Rocket,
   })[cat] || BriefcaseBusiness;
+
+const getCvUrl = (app) => app.cv?.url || app.applicant?.cv?.url || '';
 
 const statuses = [
   { value: "", label: "All" },

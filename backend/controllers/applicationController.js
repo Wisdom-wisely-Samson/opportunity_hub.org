@@ -20,6 +20,7 @@ exports.createApplication = async (req, res, next) => {
     const opportunity = await Opportunity.findById(opportunityId).populate('organization');
     if (!opportunity) return sendError(res, 404, 'Opportunity not found');
     if (opportunity.status !== 'active') return sendError(res, 400, 'This opportunity is no longer accepting applications');
+    if (opportunity.externalLink) return sendError(res, 400, 'This opportunity uses an external application link. Please apply through the external site.');
     if (new Date(opportunity.deadline) < new Date()) return sendError(res, 400, 'The deadline for this opportunity has passed');
 
     const existing = await Application.findOne({ applicant: req.user._id, opportunity: opportunityId });

@@ -39,7 +39,8 @@ api.interceptors.response.use(
         localStorage.removeItem("hub_access_token");
         localStorage.removeItem("hub_refresh_token");
         localStorage.removeItem("hub_user");
-        window.location.href = "/login";
+        const authMessage = encodeURIComponent("Session expired. Please sign in again.");
+        window.location.href = `/login?authError=${authMessage}`;
       }
     }
     return Promise.reject(error);

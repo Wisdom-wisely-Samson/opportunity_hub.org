@@ -59,6 +59,11 @@ const opportunitySchema = new mongoose.Schema({
   duration: String,
   eligibility: String,
   howToApply: String,
+  applicationType: {
+    type: String,
+    enum: ['internal', 'external'],
+    default: 'internal',
+  },
   externalLink: String,
 }, {
   timestamps: true,

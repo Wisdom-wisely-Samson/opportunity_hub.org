@@ -41,6 +41,29 @@ const createOpportunityValidator = [
     .isISO8601()
     .withMessage("Invalid deadline date"),
 
+  body("applicationType")
+    .optional()
+    .isIn(["internal", "external"])
+    .withMessage("Invalid application type"),
+
+  body("externalLink")
+    .optional()
+    .isURL({ protocols: ["http", "https"], require_protocol: true })
+    .withMessage("Please provide a valid external URL starting with http:// or https://"),
+
+  body("howToApply")
+    .optional()
+    .trim()
+    .isLength({ max: 2000 })
+    .withMessage("Application instructions cannot exceed 2000 characters"),
+
+  body("externalLink").custom((value, { req }) => {
+    if (req.body.applicationType === "external" && !value) {
+      throw new Error("External link is required for external applications");
+    }
+    return true;
+  }),
+
   // Arrays (JSON-string or array)
   body("requirements").optional().custom(jsonOrArray),
   body("benefits").optional().custom(jsonOrArray),
@@ -75,6 +98,29 @@ const updateOpportunityValidator = [
     .optional()
     .isIn(["active", "closed", "draft", "expired"])
     .withMessage("Invalid status"),
+
+  body("applicationType")
+    .optional()
+    .isIn(["internal", "external"])
+    .withMessage("Invalid application type"),
+
+  body("externalLink")
+    .optional()
+    .isURL({ protocols: ["http", "https"], require_protocol: true })
+    .withMessage("Please provide a valid external URL starting with http:// or https://"),
+
+  body("howToApply")
+    .optional()
+    .trim()
+    .isLength({ max: 2000 })
+    .withMessage("Application instructions cannot exceed 2000 characters"),
+
+  body("externalLink").custom((value, { req }) => {
+    if (req.body.applicationType === "external" && !value) {
+      throw new Error("External link is required for external applications");
+    }
+    return true;
+  }),
 
   body("deadline")
     .optional()

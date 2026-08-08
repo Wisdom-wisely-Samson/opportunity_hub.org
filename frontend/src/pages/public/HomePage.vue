@@ -165,10 +165,10 @@
                 </div>
                 <div>
                   <p class="text-sm font-bold text-gray-900 leading-none">
-                    500+
+                    {{ featured.length }}
                   </p>
                   <p class="text-[11px] text-gray-500 mt-0.5">
-                    live opportunities
+                    featured listings
                   </p>
                 </div>
               </div>
@@ -189,30 +189,6 @@
           fill="#f9fafb"
         />
       </svg>
-    </section>
-
-    <!-- ============ STATS BAR ============ -->
-    <section class="relative -mt-8 sm:-mt-12 z-20">
-      <div class="page-container">
-        <div
-          ref="statsRef"
-          class="bg-white rounded-2xl sm:rounded-3xl shadow-xl border border-gray-100 grid grid-cols-2 sm:grid-cols-4 gap-6 sm:gap-8 text-center px-6 py-8 sm:px-10 sm:py-10"
-        >
-          <div
-            v-for="(stat, i) in stats"
-            :key="stat.label"
-            class="reveal"
-            :style="{ '--d': `${i * 80}ms` }"
-          >
-            <p class="text-2xl sm:text-4xl font-bold text-primary tabular-nums">
-              {{ displayedStats[i] }}
-            </p>
-            <p class="text-xs sm:text-sm text-gray-500 mt-1">
-              {{ stat.label }}
-            </p>
-          </div>
-        </div>
-      </div>
     </section>
 
     <!-- ============ CATEGORIES ============ -->
@@ -443,14 +419,6 @@ const featured = ref([]);
 const loadingFeatured = ref(true);
 const categoryStats = ref({});
 
-const stats = [
-  { value: 500, suffix: "+", label: "Opportunities" },
-  { value: 120, suffix: "+", label: "Organizations" },
-  { value: 8000, suffix: "+", label: "Refugees Helped" },
-  { value: 15, suffix: "+", label: "Countries" },
-];
-const displayedStats = ref(stats.map(() => "0"));
-
 const categories = [
   { slug: "job", label: "Jobs", icon: BriefcaseBusiness },
   { slug: "scholarship", label: "Scholarships", icon: GraduationCap },
@@ -499,50 +467,55 @@ const orgSteps = [
 ];
 
 // ---- Floating card stack (hero signature element) ----
-const liveFeed = [
-  {
-    title: "Community Health Officer",
-    org: "UNHCR Field Office",
-    location: "Kampala, UG",
-    category: "job",
+const liveIndex = ref(0);
+
+const categoryIcon = (category) => {
+  switch (category) {
+    case "job":
+      return BriefcaseBusiness;
+    case "scholarship":
+      return GraduationCap;
+    case "grant":
+      return HandCoins;
+    case "training":
+      return BookOpen;
+    case "fellowship":
+      return Trophy;
+    case "internship":
+      return FlaskConical;
+    default:
+      return BriefcaseBusiness;
+  }
+};
+
+const liveOpportunity = computed(() => {
+  if (featured.value.length) {
+    const opp = featured.value[liveIndex.value % featured.value.length];
+    return {
+      title: opp.title,
+      org: opp.organization?.organizationName || "Opportunity Hub",
+      location: opp.location || "Across East Africa",
+      category: opp.category || "job",
+      badgeClass: `badge-${opp.category || "job"}`,
+      icon: categoryIcon(opp.category),
+    };
+  }
+
+  return {
+    title: "Browse opportunities now",
+    org: "Opportunity Hub",
+    location: "Across East Africa",
+    category: "opportunities",
     badgeClass: "badge-job",
     icon: BriefcaseBusiness,
-  },
-  {
-    title: "STEM Scholarship 2026",
-    org: "Mastercard Foundation",
-    location: "Regional",
-    category: "scholarship",
-    badgeClass: "badge-scholarship",
-    icon: GraduationCap,
-  },
-  {
-    title: "Small Business Grant",
-    org: "Danish Refugee Council",
-    location: "Nakivale, UG",
-    category: "grant",
-    badgeClass: "badge-grant",
-    icon: HandCoins,
-  },
-  {
-    title: "Digital Skills Fellowship",
-    org: "AIESEC East Africa",
-    location: "Remote",
-    category: "fellowship",
-    badgeClass: "badge-fellowship",
-    icon: Trophy,
-  },
-];
-const liveIndex = ref(0);
-const liveOpportunity = computed(() => liveFeed[liveIndex.value]);
+  };
+});
 const ghostIconA = GraduationCap;
 const ghostIconB = HandCoins;
 let liveTimer = null;
 
 // ---- Scroll reveal ----
-const statsRef = ref(null);
 let observer = null;
-let statsAnimated = false;
 const observedEls = new WeakSet();
 
 // Re-scans the DOM for .reveal / .reveal-left / .reveal-right elements and
@@ -562,35 +535,12 @@ const observeReveals = () => {
     });
 };
 
-const animateStats = () => {
-  if (statsAnimated) return;
-  statsAnimated = true;
-  const prefersReduced = window.matchMedia(
-    "(prefers-reduced-motion: reduce)",
-  ).matches;
-  stats.forEach((stat, i) => {
-    if (prefersReduced) {
-      displayedStats.value[i] = stat.value.toLocaleString() + stat.suffix;
-      return;
-    }
-    const duration = 1200;
-    const start = performance.now();
-    const tick = (now) => {
-      const progress = Math.min((now - start) / duration, 1);
-      const eased = 1 - Math.pow(1 - progress, 3);
-      const current = Math.floor(eased * stat.value);
-      displayedStats.value[i] =
-        current.toLocaleString() + (progress >= 1 ? stat.suffix : "");
-      if (progress < 1) requestAnimationFrame(tick);
-    };
-    requestAnimationFrame(tick);
-  });
-};
-
 onMounted(async () => {
   // Live card cycling
   liveTimer = setInterval(() => {
-    liveIndex.value = (liveIndex.value + 1) % liveFeed.length;
+    if (featured.value.length > 1) {
+      liveIndex.value = (liveIndex.value + 1) % featured.value.length;
+    }
   }, 3200);
 
   const isMobile = window.matchMedia("(max-width: 640px)").matches;
@@ -608,20 +558,7 @@ onMounted(async () => {
   );
   observeReveals();
 
-  if (statsRef.value) {
-    const statsObserver = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            animateStats();
-            statsObserver.disconnect();
-          }
-        });
-      },
-      { threshold: 0.3 },
-    );
-    statsObserver.observe(statsRef.value);
-  }
+
 
   try {
     const { data } = await opportunityService.getFeatured();

@@ -88,7 +88,10 @@
             </div>
             <div>
               <p class="font-bold text-gray-900">{{ c.label }}</p>
-              <p class="text-sm text-gray-600 mt-1">{{ c.value }}</p>
+              <p class="text-sm text-gray-600 mt-1">
+                <a v-if="c.link" :href="c.link" class="hover:text-primary transition-colors">{{ c.value }}</a>
+                <span v-else>{{ c.value }}</span>
+              </p>
             </div>
           </div>
           <div class="card bg-primary text-white">
@@ -133,7 +136,7 @@ const handleSubmit = async () => {
   Object.assign(form, { name: "", email: "", subject: "", message: "" });
 };
 const contacts = [
-  { icon: Mail, label: "Email", value: "info@opportunityhub.org" },
+  { icon: Mail, label: "Email", value: "wiselywisdom4@gmail.com", link: "mailto:wiselywisdom4@gmail.com" },
   { icon: MapPin, label: "Address", value: "Kampala, Uganda — East Africa" },
   {
     icon: Clock,

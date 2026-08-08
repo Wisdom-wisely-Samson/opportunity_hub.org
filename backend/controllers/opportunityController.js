@@ -154,6 +154,7 @@ exports.updateOpportunity = async (req, res, next) => {
       "duration",
       "eligibility",
       "howToApply",
+      "applicationType",
       "externalLink",
     ];
 

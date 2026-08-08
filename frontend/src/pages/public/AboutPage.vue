@@ -53,31 +53,13 @@
             </li>
           </ul>
         </div>
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
-          <div
-            class="card text-center hover:-translate-y-0.5 hover:shadow-md transition-all duration-200"
-          >
-            <p class="text-3xl sm:text-4xl font-bold text-primary">500+</p>
-            <p class="text-gray-600 mt-1 text-sm sm:text-base">
-              Active Opportunities
-            </p>
-          </div>
-          <div
-            class="card text-center hover:-translate-y-0.5 hover:shadow-md transition-all duration-200"
-          >
-            <p class="text-3xl sm:text-4xl font-bold text-primary">120+</p>
-            <p class="text-gray-600 mt-1 text-sm sm:text-base">
-              Partner Organizations
-            </p>
-          </div>
-          <div
-            class="card text-center hover:-translate-y-0.5 hover:shadow-md transition-all duration-200"
-          >
-            <p class="text-3xl sm:text-4xl font-bold text-primary">8,000+</p>
-            <p class="text-gray-600 mt-1 text-sm sm:text-base">
-              Refugees Served
-            </p>
-          </div>
+        <div class="card">
+          <h2 class="text-xl sm:text-2xl font-bold text-primary mb-3">
+            Our Reach
+          </h2>
+          <p class="text-gray-700 leading-relaxed">
+            Opportunity Hub connects refugees, organizations, and verified opportunities across East Africa and beyond. We focus on real connections, trusted partners, and measurable impact for people seeking jobs, scholarships, grants, and training.
+          </p>
         </div>
         <div class="card">
           <h2 class="text-xl sm:text-2xl font-bold text-primary mb-4">

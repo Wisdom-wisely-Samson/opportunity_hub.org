@@ -16,6 +16,7 @@
         </div>
         <h1 class="text-2xl font-bold text-gray-900">Verification Failed</h1>
         <p class="text-gray-600 text-sm mt-2">{{ error || 'The verification link is invalid or has expired.' }}</p>
+        <p class="text-sm text-gray-500 mt-3">If you already have an account, please log in and resend the verification email from your profile.</p>
         <router-link to="/login" class="btn-outline w-full mt-6 block text-center">Go to Login</router-link>
       </div>
     </div>

@@ -76,6 +76,7 @@ exports.login = async (req, res, next) => {
     if (!isMatch) return sendError(res, 401, 'Invalid email or password');
 
     if (!user.isActive) return sendError(res, 401, 'Your account has been deactivated. Please contact support.');
+    if (!user.isEmailVerified) return sendError(res, 401, 'Please verify your email before logging in. Check your inbox for the verification link.');
 
     // Update last login
     user.lastLogin = new Date();

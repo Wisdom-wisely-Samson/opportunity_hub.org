@@ -7,12 +7,14 @@
     </router-view>
   </component>
   <AppToast />
+  <CookieBanner />
 </template>
 
 <script setup>
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 import AppToast from '@/components/common/AppToast.vue'
+import CookieBanner from '@/components/common/CookieBanner.vue'
 import DefaultLayout from '@/layouts/DefaultLayout.vue'
 import AuthLayout from '@/layouts/AuthLayout.vue'
 import RefugeeDashboardLayout from '@/layouts/RefugeeDashboardLayout.vue'

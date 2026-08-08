@@ -84,7 +84,7 @@
 
           <div class="flex items-start gap-2 pt-1">
             <input v-model="form.agree" type="checkbox" id="agree" required class="w-4 h-4 mt-0.5 text-primary rounded border-gray-300 cursor-pointer flex-shrink-0" />
-            <label for="agree" class="text-sm text-gray-600 cursor-pointer">I agree to the <a href="#" class="text-primary hover:underline">Terms of Service</a> and <a href="#" class="text-primary hover:underline">Privacy Policy</a></label>
+            <label for="agree" class="text-sm text-gray-600 cursor-pointer">I agree to the <router-link to="/terms-of-service" class="text-primary hover:underline">Terms of Service</router-link> and <router-link to="/privacy-policy" class="text-primary hover:underline">Privacy Policy</router-link></label>
           </div>
 
           <div v-if="authError" class="p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-600">{{ authError }}</div>

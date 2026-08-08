@@ -49,6 +49,58 @@
           </div>
         </div>
         <div>
+          <label class="label">Application Type</label>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <button
+              type="button"
+              @click="form.applicationType = 'internal'"
+              :class="[
+                'rounded-xl border p-4 text-left transition-colors',
+                form.applicationType === 'internal'
+                  ? 'border-primary bg-primary/5'
+                  : 'border-gray-200 bg-white hover:border-primary',
+              ]"
+            >
+              <p class="font-semibold text-gray-900">Apply on platform</p>
+              <p class="text-sm text-gray-500 mt-1">Candidates submit applications directly through Opportunity Hub.</p>
+            </button>
+            <button
+              type="button"
+              @click="form.applicationType = 'external'"
+              :class="[
+                'rounded-xl border p-4 text-left transition-colors',
+                form.applicationType === 'external'
+                  ? 'border-primary bg-primary/5'
+                  : 'border-gray-200 bg-white hover:border-primary',
+              ]"
+            >
+              <p class="font-semibold text-gray-900">External application link</p>
+              <p class="text-sm text-gray-500 mt-1">Send applicants to an external website without requiring platform signup.</p>
+            </button>
+          </div>
+        </div>
+        <div v-if="form.applicationType === 'internal'">
+          <label class="label">How to apply</label>
+          <textarea
+            v-model="form.howToApply"
+            rows="3"
+            class="textarea-field"
+            placeholder="Add application instructions for this opportunity..."
+          ></textarea>
+          <p class="text-xs text-gray-400 mt-1">Optional instructions for applicants applying on the platform.</p>
+        </div>
+        <div v-if="form.applicationType === 'external'">
+          <label class="label">External application link *</label>
+          <input
+            v-model="form.externalLink"
+            type="url"
+            required
+            class="input-field"
+            placeholder="https://example.com/application"
+          />
+          <p class="text-xs text-gray-400 mt-1">Applicants will be sent directly to this URL without needing Opportunity Hub login.</p>
+        </div>
+        <div>
           <label class="label">Description *</label>
           <textarea
             v-model="form.description"
@@ -389,6 +441,9 @@ const form = reactive({
   benefits: [],
   tags: [],
   status: "active",
+  applicationType: "internal",
+  howToApply: "",
+  externalLink: "",
 });
 
 const minDate = computed(() => {
@@ -497,6 +552,10 @@ onMounted(async () => {
     form.benefits = opp.benefits || [];
     form.tags = opp.tags || [];
     form.status = opp.status || "active";
+
+    form.applicationType = opp.externalLink ? 'external' : 'internal';
+    form.howToApply = opp.howToApply || "";
+    form.externalLink = opp.externalLink || "";
 
     // Load existing cover image preview
     if (opp.coverImage?.url) {

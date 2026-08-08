@@ -27,6 +27,12 @@ const protect = async (req, res, next) => {
     req.user = user;
     next();
   } catch (err) {
+    if (err.name === 'JsonWebTokenError') {
+      return sendError(res, 401, 'Invalid or malformed token. Please log in again.');
+    }
+    if (err.name === 'TokenExpiredError') {
+      return sendError(res, 401, 'Your session has expired. Please log in again.');
+    }
     next(err);
   }
 };

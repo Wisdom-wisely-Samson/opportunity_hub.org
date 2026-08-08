@@ -17,6 +17,7 @@ const opportunityRoutes = require("./routes/opportunityRoutes");
 const applicationRoutes = require("./routes/applicationRoutes");
 const notificationRoutes = require("./routes/notificationRoutes");
 const adminRoutes = require("./routes/adminRoutes");
+const siteRoutes = require("./routes/siteRoutes");
 
 const app = express();
 
@@ -77,6 +78,7 @@ app.use("/api/organizations", organizationRoutes);
 app.use("/api/opportunities", opportunityRoutes);
 app.use("/api/applications", applicationRoutes);
 app.use("/api/notifications", notificationRoutes);
+app.use("/api/site", siteRoutes);
 app.use("/api/admin", adminRoutes);
 
 // 404 handler
