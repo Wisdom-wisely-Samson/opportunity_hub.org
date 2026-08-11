@@ -5,7 +5,12 @@ const registerValidator = [
   body('password')
     .isLength({ min: 8 }).withMessage('Password must be at least 8 characters')
     .matches(/(?=.*[a-z])/).withMessage('Password must contain a lowercase letter')
-    .matches(/(?=.*[A-Z])/).withMessage('Password must contain an uppercase letter')
+    .custom((value) => {
+      if (!value || value[0] !== value[0].toUpperCase()) {
+        throw new Error('Password must start with an uppercase letter');
+      }
+      return true;
+    })
     .matches(/(?=.*\d)/).withMessage('Password must contain a number'),
   body('role').optional().isIn(['refugee', 'organization']).withMessage('Invalid role'),
   body('fullName').optional().trim().isLength({ min: 2, max: 100 }).withMessage('Full name must be between 2 and 100 characters'),
@@ -24,7 +29,12 @@ const resetPasswordValidator = [
   body('password')
     .isLength({ min: 8 }).withMessage('Password must be at least 8 characters')
     .matches(/(?=.*[a-z])/).withMessage('Password must contain a lowercase letter')
-    .matches(/(?=.*[A-Z])/).withMessage('Password must contain an uppercase letter')
+    .custom((value) => {
+      if (!value || value[0] !== value[0].toUpperCase()) {
+        throw new Error('Password must start with an uppercase letter');
+      }
+      return true;
+    })
     .matches(/(?=.*\d)/).withMessage('Password must contain a number'),
   body('confirmPassword').custom((value, { req }) => {
     if (value !== req.body.password) throw new Error('Passwords do not match');
@@ -37,7 +47,12 @@ const changePasswordValidator = [
   body('newPassword')
     .isLength({ min: 8 }).withMessage('Password must be at least 8 characters')
     .matches(/(?=.*[a-z])/).withMessage('Password must contain a lowercase letter')
-    .matches(/(?=.*[A-Z])/).withMessage('Password must contain an uppercase letter')
+    .custom((value) => {
+      if (!value || value[0] !== value[0].toUpperCase()) {
+        throw new Error('Password must start with an uppercase letter');
+      }
+      return true;
+    })
     .matches(/(?=.*\d)/).withMessage('Password must contain a number'),
 ];
 

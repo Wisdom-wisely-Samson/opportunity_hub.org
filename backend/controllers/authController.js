@@ -52,7 +52,7 @@ exports.register = async (req, res, next) => {
     user.refreshToken = refreshToken;
     await user.save({ validateBeforeSave: false });
 
-    return sendSuccess(res, 201, 'Account created successfully. Please check your email to verify your account.', {
+    return sendSuccess(res, 201, 'Account created successfully. You can complete your profile and verify your email later.', {
       accessToken,
       refreshToken,
       user: user.toPublicJSON(),
@@ -76,7 +76,6 @@ exports.login = async (req, res, next) => {
     if (!isMatch) return sendError(res, 401, 'Invalid email or password');
 
     if (!user.isActive) return sendError(res, 401, 'Your account has been deactivated. Please contact support.');
-    if (!user.isEmailVerified) return sendError(res, 401, 'Please verify your email before logging in. Check your inbox for the verification link.');
 
     // Update last login
     user.lastLogin = new Date();

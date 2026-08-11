@@ -127,14 +127,18 @@ const showPwd = ref(false)
 const selectRole = (role) => { selectedRole.value = role }
 
 const handleRegister = async () => {
-  if (form.password !== form.confirmPassword) return
+  if (form.password !== form.confirmPassword) {
+    authError.value = 'Passwords do not match.'
+    return
+  }
+
   authError.value = ''
   isLoading.value = true
   try {
     await authStore.register({ ...form, role: selectedRole.value })
-    toast.success('Account created! Please check your email to verify.')
+    toast.success('Account created! Please complete your profile to continue. Email verification is optional.')
     const role = selectedRole.value
-    if (role === 'refugee') router.push('/refugee/dashboard')
+    if (role === 'refugee') router.push('/refugee/profile')
     else if (role === 'organization') router.push('/org/profile')
     else router.push('/')
   } catch (err) {

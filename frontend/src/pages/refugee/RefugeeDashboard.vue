@@ -33,11 +33,10 @@
         </div>
       </div>
       <div
-        v-if="!user?.isEmailVerified"
         class="relative mt-4 p-3 bg-accent/20 border border-accent/30 rounded-lg text-sm text-accent-100 flex items-start gap-2"
       >
         <AlertTriangle class="w-4 h-4 flex-shrink-0 mt-0.5" />
-        <span>Please verify your email to unlock all features.</span>
+        <span>Email verification is optional, and you can keep using the platform right away.</span>
       </div>
     </div>
 

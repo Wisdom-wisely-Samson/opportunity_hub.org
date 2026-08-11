@@ -109,9 +109,16 @@ export const getInitials = (name) => {
 };
 
 export const extractErrorMessage = (error) => {
-  return (
-    error?.response?.data?.message || error?.message || "Something went wrong"
-  );
+  const responseData = error?.response?.data;
+  const validationErrors = responseData?.errors;
+
+  if (Array.isArray(validationErrors) && validationErrors.length > 0) {
+    const firstError = validationErrors[0];
+    const message = firstError?.msg || firstError?.message || firstError;
+    if (message) return message;
+  }
+
+  return responseData?.message || error?.message || "Something went wrong";
 };
 
 export const debounce = (fn, delay = 300) => {
