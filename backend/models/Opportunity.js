@@ -20,7 +20,7 @@ const opportunitySchema = new mongoose.Schema({
   organization: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Organization',
-    required: true,
+    default: null,
   },
   postedBy: {
     type: mongoose.Schema.Types.ObjectId,

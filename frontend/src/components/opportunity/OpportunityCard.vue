@@ -243,26 +243,36 @@
 
           <!-- Button -->
 
-          <router-link
-            :to="`/opportunities/${opportunity._id}`"
-            class="inline-flex items-center gap-2 rounded-2xl bg-[#01596D] px-5 py-3 text-sm font-semibold text-white shadow-lg transition-all duration-300 hover:-translate-y-1 hover:bg-[#027B8C] hover:shadow-xl"
-          >
-            View Details
-
-            <svg
-              class="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
+          <div class="flex flex-wrap items-center gap-2">
+            <button
+              type="button"
+              @click="shareOpportunity"
+              class="inline-flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50"
             >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M9 5l7 7-7 7"
-              />
-            </svg>
-          </router-link>
+              <Share2 class="w-4 h-4" />
+              Share
+            </button>
+            <router-link
+              :to="`/opportunities/${opportunity._id}`"
+              class="inline-flex items-center gap-2 rounded-2xl bg-[#01596D] px-5 py-3 text-sm font-semibold text-white shadow-lg transition-all duration-300 hover:-translate-y-1 hover:bg-[#027B8C] hover:shadow-xl"
+            >
+              View Details
+
+              <svg
+                class="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 5l7 7-7 7"
+                />
+              </svg>
+            </router-link>
+          </div>
         </div>
       </div>
     </div>
@@ -287,6 +297,7 @@ import {
   deadlineUrgency,
   getInitials,
 } from "@/utils/helpers";
+import { Share2 } from "lucide-vue-next";
 
 const props = defineProps({
   opportunity: {
@@ -345,6 +356,28 @@ const deadlineUrgencyClass = computed(() => {
 /* --------------------------------------------
  * Save / Unsave Opportunity
  * ------------------------------------------ */
+
+const shareOpportunity = async () => {
+  const url = `${window.location.origin}/opportunities/${props.opportunity._id}`;
+  const title = props.opportunity.title;
+  const text = `${title} at ${props.opportunity.organization?.organizationName || "Opportunity Hub"}`;
+
+  try {
+    if (navigator.share) {
+      await navigator.share({ title, text, url });
+      toast.success("Share dialog opened.");
+      return;
+    }
+
+    await navigator.clipboard.writeText(url);
+    toast.success("Opportunity link copied. Paste it into any social media platform.");
+  } catch (err) {
+    toast.error(
+      err?.response?.data?.message ||
+        "Unable to share opportunity. Please try again.",
+    );
+  }
+};
 
 const toggleSave = async () => {
   try {

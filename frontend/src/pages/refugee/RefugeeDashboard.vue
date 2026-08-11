@@ -61,6 +61,12 @@
         color="green"
       />
       <StatCard
+        title="Posted"
+        :value="postedCount"
+        :icon="BriefcaseBusiness"
+        color="primary"
+      />
+      <StatCard
         title="Saved"
         :value="savedCount"
         :icon="Bookmark"
@@ -114,6 +120,20 @@
           <span
             class="text-xs font-semibold text-gray-700 group-hover:text-primary"
             >Edit Profile</span
+          >
+        </router-link>
+        <router-link
+          to="/refugee/opportunities/create"
+          class="flex flex-col items-center gap-2 p-4 bg-white rounded-xl border border-gray-100 hover:border-primary hover:shadow-sm hover:-translate-y-0.5 transition-all duration-200 text-center group"
+        >
+          <div
+            class="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-colors"
+          >
+            <Plus class="w-5 h-5" />
+          </div>
+          <span
+            class="text-xs font-semibold text-gray-700 group-hover:text-primary"
+            >Post Opportunity</span
           >
         </router-link>
         <router-link
@@ -199,6 +219,7 @@ import LoadingSpinner from "@/components/common/LoadingSpinner.vue";
 import EmptyState from "@/components/common/EmptyState.vue";
 import { applicationService } from "@/services/applicationService";
 import { userService } from "@/services/userService";
+import { opportunityService } from "@/services/opportunityService";
 import { getInitials, formatRelativeTime } from "@/utils/helpers";
 import {
   MapPin,
@@ -210,6 +231,7 @@ import {
   Search,
   User,
   ArrowRight,
+  Plus,
   BriefcaseBusiness,
   GraduationCap,
   HandCoins,
@@ -226,6 +248,7 @@ const initials = computed(() =>
 );
 const applications = ref([]);
 const savedCount = ref(0);
+const postedCount = ref(0);
 const isLoading = ref(true);
 
 const categoryIcon = (cat) =>
@@ -245,11 +268,21 @@ const stats = computed(() => ({
   accepted: applications.value.filter((a) => a.status === "accepted").length,
 }));
 
+const loadPostedCount = async () => {
+  try {
+    const { data } = await opportunityService.getMyPostings();
+    postedCount.value = Array.isArray(data.data) ? data.data.length : 0;
+  } catch {
+    postedCount.value = 0;
+  }
+};
+
 onMounted(async () => {
   try {
     const [appRes, savedRes] = await Promise.all([
       applicationService.getApplications({ limit: 10 }),
       userService.getSavedOpportunities({ limit: 1 }),
+      loadPostedCount(),
     ]);
     applications.value = appRes.data.data || [];
     savedCount.value = savedRes.data.meta?.total || 0;

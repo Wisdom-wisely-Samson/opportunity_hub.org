@@ -2,7 +2,7 @@
   <div class="max-w-2xl space-y-6">
     <div class="flex items-center gap-3">
       <router-link
-        to="/org/opportunities"
+        :to="cancelRoute"
         class="p-2 text-gray-500 hover:text-primary rounded-lg hover:bg-gray-100 transition-colors"
       >
         <ArrowLeft class="w-5 h-5" />
@@ -10,6 +10,9 @@
       <h1 class="text-xl sm:text-2xl font-bold text-gray-900">
         {{ isEditing ? "Edit Opportunity" : "Post New Opportunity" }}
       </h1>
+      <p class="text-sm text-gray-500 mt-1">
+        You have created <span class="font-semibold text-gray-900">{{ createdCount }}</span> opportunities.
+      </p>
     </div>
 
     <form @submit.prevent="handleSubmit" class="space-y-5">
@@ -379,7 +382,7 @@
 
       <div class="flex gap-3">
         <router-link
-          to="/org/opportunities"
+          :to="cancelRoute"
           class="btn-outline btn-lg flex-1 text-center"
           >Cancel</router-link
         >
@@ -405,6 +408,7 @@
 <script setup>
 import { ref, reactive, computed, onMounted } from "vue";
 import { useRouter, useRoute } from "vue-router";
+import { useAuthStore } from "@/stores/authStore";
 import { opportunityService } from "@/services/opportunityService";
 import { useToast } from "@/composables/useToast";
 import { extractErrorMessage } from "@/utils/helpers";
@@ -412,6 +416,7 @@ import { ArrowLeft, ImageUp, X, Loader2 } from "lucide-vue-next";
 
 const router = useRouter();
 const route = useRoute();
+const authStore = useAuthStore();
 const toast = useToast();
 const isSubmitting = ref(false);
 const submitError = ref("");
@@ -427,6 +432,7 @@ const coverImageError = ref("");
 const isDragging = ref(false);
 
 const isEditing = computed(() => !!route.params.id);
+const createdCount = ref(0);
 
 const form = reactive({
   title: "",
@@ -494,6 +500,27 @@ const removeCoverImage = () => {
   if (fileInputRef.value) fileInputRef.value.value = "";
 };
 
+const isRefugee = computed(() => authStore.user?.role === "refugee");
+const redirectAfterSave = computed(() =>
+  isRefugee.value ? "/refugee/dashboard" : "/org/opportunities"
+);
+const cancelRoute = computed(() =>
+  isRefugee.value ? "/refugee/dashboard" : "/org/opportunities"
+);
+
+const loadCreatedCount = async () => {
+  try {
+    const response = isRefugee.value
+      ? await opportunityService.getMyPostings()
+      : await opportunityService.getMyOpportunities();
+    createdCount.value = Array.isArray(response.data.data)
+      ? response.data.data.length
+      : 0;
+  } catch {
+    createdCount.value = 0;
+  }
+};
+
 const handleSubmit = async () => {
   isSubmitting.value = true;
   submitError.value = "";
@@ -523,7 +550,7 @@ const handleSubmit = async () => {
       toast.success("Opportunity posted!");
     }
 
-    router.push("/org/opportunities");
+    router.push(redirectAfterSave.value);
   } catch (err) {
     submitError.value = extractErrorMessage(err);
   } finally {
@@ -531,6 +558,8 @@ const handleSubmit = async () => {
   }
 };
 onMounted(async () => {
+  await loadCreatedCount();
+
   if (!isEditing.value) return;
 
   try {

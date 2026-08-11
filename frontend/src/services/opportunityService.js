@@ -20,4 +20,6 @@ export const opportunityService = {
 
   getMyOpportunities: (params) =>
     api.get("/opportunities/my-organization", { params }),
+
+  getMyPostings: () => api.get("/opportunities/my-postings"),
 };

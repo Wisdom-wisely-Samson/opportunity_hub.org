@@ -33,6 +33,7 @@ const router = createRouter({
     { path: '/org/dashboard', component: () => import('@/pages/organization/OrgDashboard.vue'), meta: { requiresAuth: true, role: 'organization', layout: 'org' } },
     { path: '/org/profile', component: () => import('@/pages/organization/OrgProfile.vue'), meta: { requiresAuth: true, role: 'organization', layout: 'org' } },
     { path: '/org/opportunities/create', component: () => import('@/pages/organization/CreateOpportunity.vue'), meta: { requiresAuth: true, role: 'organization', layout: 'org' } },
+    { path: '/refugee/opportunities/create', component: () => import('@/pages/organization/CreateOpportunity.vue'), meta: { requiresAuth: true, role: 'refugee', layout: 'refugee' } },
     { path: '/org/opportunities/:id/edit', component: () => import('@/pages/organization/CreateOpportunity.vue'), meta: { requiresAuth: true, role: 'organization', layout: 'org' } },
     { path: '/org/opportunities', component: () => import('@/pages/organization/ManageOpportunities.vue'), meta: { requiresAuth: true, role: 'organization', layout: 'org' } },
     { path: '/org/applicants', component: () => import('@/pages/organization/ApplicantsPage.vue'), meta: { requiresAuth: true, role: 'organization', layout: 'org' } },

@@ -21,6 +21,12 @@ router.get(
   oppController.getMyOrganizationOpportunities,
 );
 
+router.get(
+  "/my-postings",
+  protect,
+  oppController.getMyPostings,
+);
+
 router.get("/:id", optionalAuth, oppController.getOpportunityById);
 
 // Protected routes
@@ -28,7 +34,7 @@ router.use(protect);
 
 router.post(
   "/",
-  authorize("organization"),
+  authorize("organization", "refugee"),
   imageUpload.single("coverImage"),
   createOpportunityValidator,
   oppController.createOpportunity,

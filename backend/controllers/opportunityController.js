@@ -28,16 +28,18 @@ exports.createOpportunity = async (req, res, next) => {
     if (!errors.isEmpty())
       return sendError(res, 400, "Validation failed", errors.array());
 
-    // Organization check
-    const org = await Organization.findOne({ user: req.user._id });
-    if (!org)
-      return sendError(res, 403, "Please create an organization profile first");
-    if (!org.isVerified)
-      return sendError(
-        res,
-        403,
-        "Your organization must be verified before posting opportunities",
-      );
+    let org = null;
+    if (req.user.role === "organization") {
+      org = await Organization.findOne({ user: req.user._id });
+      if (!org)
+        return sendError(res, 403, "Please create an organization profile first");
+      if (!org.isVerified)
+        return sendError(
+          res,
+          403,
+          "Your organization must be verified before posting opportunities",
+        );
+    }
 
     // Cover image upload
     let coverImage = null;
@@ -50,12 +52,17 @@ exports.createOpportunity = async (req, res, next) => {
       coverImage = { url: result.secure_url, publicId: result.public_id };
     }
 
-    const opportunity = await Opportunity.create({
+    const opportunityData = {
       ...req.body,
-      organization: org._id,
       postedBy: req.user._id,
       coverImage,
-    });
+    };
+
+    if (org) {
+      opportunityData.organization = org._id;
+    }
+
+    const opportunity = await Opportunity.create(opportunityData);
 
     await opportunity.populate(
       "organization",
@@ -336,6 +343,18 @@ exports.getMyOrganizationOpportunities = async (req, res, next) => {
       "Organization opportunities retrieved",
       opportunities,
     );
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.getMyPostings = async (req, res, next) => {
+  try {
+    const opportunities = await Opportunity.find({ postedBy: req.user._id })
+      .populate("organization", "organizationName logo isVerified type")
+      .sort("-createdAt");
+
+    return sendSuccess(res, 200, "Your posted opportunities retrieved", opportunities);
   } catch (err) {
     next(err);
   }
