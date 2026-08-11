@@ -1,51 +1,46 @@
 <template>
   <div
-    class="group relative overflow-hidden rounded-3xl border border-white/10 bg-white/5 backdrop-blur-xl p-6 transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-2xl hover:shadow-primary/10"
+    class="group relative overflow-hidden rounded-3xl border p-6 shadow-[0_18px_45px_-20px_rgba(15,23,42,0.35)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_25px_55px_-18px_rgba(15,23,42,0.45)]"
+    :class="cardClasses"
   >
-    <!-- Background Glow -->
     <div
-      class="absolute -right-8 -top-8 h-24 w-24 rounded-full opacity-20 blur-3xl"
+      class="absolute -right-8 -top-8 h-24 w-24 rounded-full opacity-25 blur-3xl"
       :class="iconBackground"
     />
 
-    <!-- Header -->
     <div class="relative flex items-start justify-between">
       <div>
-        <p class="text-sm font-medium text-white/60">
+        <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500"
+          :class="titleColor">
           {{ title }}
         </p>
 
-        <h2 class="mt-3 text-4xl font-bold tracking-tight text-white">
+        <h2 class="mt-3 text-3xl font-black tracking-tight text-slate-900">
           {{ displayValue }}
         </h2>
       </div>
 
       <div
-        class="flex h-14 w-14 items-center justify-center rounded-2xl"
+        class="flex h-14 w-14 items-center justify-center rounded-2xl shadow-inner"
         :class="iconContainer"
       >
         <component :is="icon" class="h-7 w-7" :class="iconColor" />
       </div>
     </div>
 
-    <!-- Footer -->
     <div class="relative mt-6 flex items-center justify-between">
       <div class="flex items-center gap-2">
-        <ArrowTrendingUpIcon v-if="trend >= 0" class="h-5 w-5 text-green-400" />
+        <ArrowTrendingUpIcon v-if="trend >= 0" class="h-5 w-5 text-green-500" />
+        <ArrowTrendingDownIcon v-else class="h-5 w-5 text-red-500" />
 
-        <ArrowTrendingDownIcon v-else class="h-5 w-5 text-red-400" />
-
-        <span
-          class="font-semibold"
-          :class="trend >= 0 ? 'text-green-400' : 'text-red-400'"
-        >
+        <span class="font-semibold" :class="trend >= 0 ? 'text-green-600' : 'text-red-600'">
           {{ Math.abs(trend) }}%
         </span>
 
-        <span class="text-sm text-white/50"> this month </span>
+        <span class="text-sm font-medium text-slate-500"> this month </span>
       </div>
 
-      <span class="rounded-full bg-white/5 px-3 py-1 text-xs text-white/50">
+      <span class="rounded-full bg-slate-900/5 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-slate-600">
         Live
       </span>
     </div>
@@ -103,26 +98,52 @@ watchEffect(() => {
 
 const displayValue = computed(() => current.value.toLocaleString());
 
+const cardClasses = computed(
+  () =>
+    ({
+      primary: "border-primary/20 bg-gradient-to-br from-primary/10 via-white to-white",
+      green: "border-green-500/20 bg-gradient-to-br from-green-500/10 via-white to-white",
+      blue: "border-blue-500/20 bg-gradient-to-br from-blue-500/10 via-white to-white",
+      red: "border-red-500/20 bg-gradient-to-br from-red-500/10 via-white to-white",
+      yellow: "border-yellow-500/20 bg-gradient-to-br from-yellow-500/10 via-white to-white",
+      purple: "border-purple-500/20 bg-gradient-to-br from-purple-500/10 via-white to-white",
+    })[props.color] || "border-primary/20 bg-gradient-to-br from-primary/10 via-white to-white",
+);
+
+const titleColor = computed(
+  () =>
+    ({
+      primary: "text-primary-700",
+      green: "text-green-700",
+      blue: "text-blue-700",
+      red: "text-red-700",
+      yellow: "text-yellow-700",
+      purple: "text-purple-700",
+    })[props.color] || "text-primary-700",
+);
+
 const iconContainer = computed(
   () =>
     ({
-      primary: "bg-primary/20",
-      green: "bg-green-500/20",
-      blue: "bg-blue-500/20",
-      red: "bg-red-500/20",
-      yellow: "bg-yellow-500/20",
-    })[props.color] || "bg-primary/20",
+      primary: "bg-primary/15",
+      green: "bg-green-500/15",
+      blue: "bg-blue-500/15",
+      red: "bg-red-500/15",
+      yellow: "bg-yellow-500/15",
+      purple: "bg-purple-500/15",
+    })[props.color] || "bg-primary/15",
 );
 
 const iconColor = computed(
   () =>
     ({
-      primary: "text-primary-300",
-      green: "text-green-400",
-      blue: "text-blue-400",
-      red: "text-red-400",
-      yellow: "text-yellow-400",
-    })[props.color] || "text-primary-300",
+      primary: "text-primary-600",
+      green: "text-green-600",
+      blue: "text-blue-600",
+      red: "text-red-600",
+      yellow: "text-yellow-600",
+      purple: "text-purple-600",
+    })[props.color] || "text-primary-600",
 );
 
 const iconBackground = computed(
@@ -133,6 +154,7 @@ const iconBackground = computed(
       blue: "bg-blue-500",
       red: "bg-red-500",
       yellow: "bg-yellow-500",
+      purple: "bg-purple-500",
     })[props.color] || "bg-primary",
 );
 </script>

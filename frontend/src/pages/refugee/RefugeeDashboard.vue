@@ -43,29 +43,28 @@
     <!-- Stats -->
     <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
       <StatCard
-        label="Total Applications"
+        title="Total Applications"
         :value="stats.total"
         :icon="FileText"
-        iconBg="bg-blue-50"
+        color="blue"
       />
       <StatCard
-        label="Pending Review"
+        title="Pending Review"
         :value="stats.pending"
         :icon="Hourglass"
-        iconBg="bg-yellow-50"
+        color="yellow"
       />
       <StatCard
-        label="Accepted"
+        title="Accepted"
         :value="stats.accepted"
         :icon="CircleCheck"
-        iconBg="bg-green-50"
-        valueColor="text-green-600"
+        color="green"
       />
       <StatCard
-        label="Saved"
+        title="Saved"
         :value="savedCount"
         :icon="Bookmark"
-        iconBg="bg-purple-50"
+        color="purple"
       />
     </div>
 
